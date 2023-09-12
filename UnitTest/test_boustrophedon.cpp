@@ -9,6 +9,7 @@ int main()
     std::vector<geometry_msgs::Pose2D> exploration_path;
 
     cv::Mat room_map = cv::imread("sample/20230824.pgm");
+    // boustrophedon_explorer_.getExplorationPath(room_map, exploration_path, )
 
     return 0;
 }
