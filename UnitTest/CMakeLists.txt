@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}_boustrophedon
 
 target_link_libraries(${PROJECT_NAME}_boustrophedon
     cccp_algorithm
+    yaml-cpp
 )
 
 target_include_directories(${PROJECT_NAME}_boustrophedon PRIVATE
@@ -14,4 +15,5 @@ target_include_directories(${PROJECT_NAME}_boustrophedon PRIVATE
     ${CMAKE_SOURCE_DIR}/utils/include
     ${Boost_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/thirdparties/yaml-cpp/include
 )

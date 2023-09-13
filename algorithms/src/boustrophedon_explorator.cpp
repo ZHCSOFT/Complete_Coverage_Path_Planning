@@ -309,17 +309,17 @@ void BoustrophedonExplorer::computeCellDecomposition(const cv::Mat& room_map, co
 		// count number of segments within this row
 		for(size_t x=0; x<room_map.cols; ++x)
 		{
-			if(hit_white_pixel == false && room_map.at<uchar>(y,x) == 255)
+			if(hit_white_pixel == false && room_map.at<uchar>(y, x) == 255)
 				hit_white_pixel = true;
 			else if(hit_white_pixel == true)
 			{
-				if(obstacle_hit == false && room_map.at<uchar>(y,x) == 0) // check for obstacle
+				if(obstacle_hit == false && room_map.at<uchar>(y, x) == 0) // check for obstacle
 				{
 					++number_of_segments;
 					obstacle_hit = true;
 					current_obstacles_start_x.push_back(x);
 				}
-				else if(obstacle_hit == true && room_map.at<uchar>(y,x) == 255) // check for leaving obstacle
+				else if(obstacle_hit == true && room_map.at<uchar>(y, x) == 255) // check for leaving obstacle
 				{
 					obstacle_hit = false;
 					current_obstacles_end_x.push_back(x);
@@ -348,14 +348,14 @@ void BoustrophedonExplorer::computeCellDecomposition(const cv::Mat& room_map, co
 			// check the current slice again for critical points
 			for(int x=0; x<room_map.cols; ++x)
 			{
-				if(hit_white_pixel == false && room_map.at<uchar>(y,x) == 255)
+				if(hit_white_pixel == false && room_map.at<uchar>(y, x) == 255)
 					hit_white_pixel = true;
-				else if(hit_white_pixel == true && room_map.at<uchar>(y,x) == 0)
+				else if(hit_white_pixel == true && room_map.at<uchar>(y, x) == 0)
 				{
 					// check over black pixel for other black pixels, if none occur a critical point is found
 					bool critical_point = true;
 					for(int dx=-1; dx<=1; ++dx)
-						if(room_map.at<uchar>(y-1,std::max(0,std::min(x+dx, room_map.cols-1))) == 0)
+						if(room_map.at<uchar>(y-1, std::max(0,std::min(x+dx, room_map.cols-1))) == 0)
 							critical_point = false;
 
 					// if a critical point is found mark the separation, note that this algorithm goes left and right
@@ -366,8 +366,8 @@ void BoustrophedonExplorer::computeCellDecomposition(const cv::Mat& room_map, co
 						// to the left until a black pixel is hit
 						for(int dx=-1; x+dx>=0; --dx)
 						{
-							uchar& val = cell_map.at<uchar>(y,x+dx);
-							if(val == 255 && cell_map.at<uchar>(y-1,x+dx) == 255)
+							uchar& val = cell_map.at<uchar>(y, x+dx);
+							if(val == 255 && cell_map.at<uchar>(y-1, x+dx) == 255)
 								val = BORDER_PIXEL_VALUE;
 							else if(val == 0)
 								break;
@@ -376,8 +376,8 @@ void BoustrophedonExplorer::computeCellDecomposition(const cv::Mat& room_map, co
 						// to the right until a black pixel is hit
 						for(int dx=1; x+dx<room_map.cols; ++dx)
 						{
-							uchar& val = cell_map.at<uchar>(y,x+dx);
-							if(val == 255 && cell_map.at<uchar>(y-1,x+dx) == 255)
+							uchar& val = cell_map.at<uchar>(y, x+dx);
+							if(val == 255 && cell_map.at<uchar>(y-1, x+dx) == 255)
 								val = BORDER_PIXEL_VALUE;
 							else if(val == 0)
 								break;
@@ -393,7 +393,7 @@ void BoustrophedonExplorer::computeCellDecomposition(const cv::Mat& room_map, co
 			{
 				if(room_map.at<uchar>(y-1,x) == 255 && hit_white_pixel == false)
 					hit_white_pixel = true;
-				else if(hit_white_pixel == true && room_map.at<uchar>(y-1,x) == 0)
+				else if(hit_white_pixel == true && room_map.at<uchar>(y-1, x) == 0)
 				{
 					// check over black pixel for other black pixels, if none occur a critical point is found
 					bool critical_point = true;
@@ -406,7 +406,7 @@ void BoustrophedonExplorer::computeCellDecomposition(const cv::Mat& room_map, co
 					// behind other obstacles on the same y-value as the critical point
 					if(critical_point == true)
 					{
-						const int ym2 = std::max(0,(int)y-2);
+						const int ym2 = std::max(0, (int)y-2);
 
 						// to the left until a black pixel is hit
 						for(int dx=-1; x+dx>=0; --dx)
@@ -450,7 +450,7 @@ void BoustrophedonExplorer::computeCellDecomposition(const cv::Mat& room_map, co
 	for (int i=1; i<=number_of_cells; ++i)
 	{
 		cv::Mat cell_copy(cell_map_labels == i);
-		std::vector<std::vector<cv::Point> > cellsi;
+		std::vector<std::vector<cv::Point>> cellsi;
 #if CV_MAJOR_VERSION<=3
 		cv::findContours(cell_copy, cellsi, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 #else
@@ -495,8 +495,8 @@ int BoustrophedonExplorer::mergeCells(cv::Mat& cell_map, cv::Mat& cell_map_label
 	//   --> re-assign the cell borders with -1
 	for (int v=0; v<cell_map_labels.rows; ++v)
 		for (int u=0; u<cell_map_labels.cols; ++u)
-			if (cell_map_labels.at<int>(v,u) == BORDER_PIXEL_VALUE*256)
-				cell_map_labels.at<int>(v,u) = -1;
+			if (cell_map_labels.at<int>(v, u) == BORDER_PIXEL_VALUE*256)
+				cell_map_labels.at<int>(v, u) = -1;
 	//   --> flood fill cell regions with unique id labels
 	std::map<int, boost::shared_ptr<BoustrophedonCell> > cell_index_mapping;		// maps each cell label --> to the cell object
 	int label_index = 1;
@@ -505,12 +505,12 @@ int BoustrophedonExplorer::mergeCells(cv::Mat& cell_map, cv::Mat& cell_map_label
 		for (int u=0; u<cell_map_labels.cols; ++u)
 		{
 			// if the map has already received a label for that pixel --> skip
-			if (cell_map_labels.at<int>(v,u)!=65280)
+			if (cell_map_labels.at<int>(v, u)!=65280)
 				continue;
 
 			// fill each cell with a unique id
 			cv::Rect bounding_box;
-			const double area = cv::floodFill(cell_map_labels, cv::Point(u,v), label_index, &bounding_box, 0, 0, 4);
+			const double area = cv::floodFill(cell_map_labels, cv::Point(u, v), label_index, &bounding_box, 0, 0, 4);
 			cell_index_mapping[label_index] = boost::shared_ptr<BoustrophedonCell>(new BoustrophedonCell(label_index, area, bounding_box));
 			label_index++;
 			if (label_index == INT_MAX)
@@ -524,18 +524,18 @@ int BoustrophedonExplorer::mergeCells(cv::Mat& cell_map, cv::Mat& cell_map_label
 	{
 		for (int u=1; u<cell_map_labels.cols-1; ++u)
 		{
-			if (cell_map_labels.at<int>(v,u)==-1)	// only check the border points for neighborhood relationships
+			if (cell_map_labels.at<int>(v, u) == -1)	// only check the border points for neighborhood relationships
 			{
-				const int label_left = cell_map_labels.at<int>(v,u-1);
-				const int label_right = cell_map_labels.at<int>(v,u+1);
-				if (label_left>0 && label_right>0)
+				const int label_left = cell_map_labels.at<int>(v, u-1);
+				const int label_right = cell_map_labels.at<int>(v, u+1);
+				if (label_left > 0 && label_right > 0)
 				{
 					cell_index_mapping[label_left]->neighbors_.insert(cell_index_mapping[label_right]);
 					cell_index_mapping[label_right]->neighbors_.insert(cell_index_mapping[label_left]);
 				}
-				const int label_up = cell_map_labels.at<int>(v-1,u);
-				const int label_down = cell_map_labels.at<int>(v+1,u);
-				if (label_up>0 && label_down>0)
+				const int label_up = cell_map_labels.at<int>(v-1, u);
+				const int label_down = cell_map_labels.at<int>(v+1, u);
+				if (label_up > 0 && label_down > 0)
 				{
 					cell_index_mapping[label_up]->neighbors_.insert(cell_index_mapping[label_down]);
 					cell_index_mapping[label_down]->neighbors_.insert(cell_index_mapping[label_up]);

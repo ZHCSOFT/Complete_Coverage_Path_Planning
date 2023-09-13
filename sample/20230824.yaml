@@ -1,7 +1,28 @@
 image: map.pgm
 resolution: 0.050000
 origin: [-31.200001, -56.799999, 0.000000]
+starting_position: [0, 0, 0]
 negate: 0
 occupied_thresh: 0.65
 free_thresh: 0.196
+
+# path_eps_px
+#   [pixel] distance between two points when generating the (line) path
+#   where one pixel is the size of one cell in the navigation grid map
+# double
+path_eps_px: 6.0
+
+# min_cell_area_px
+#   parameters specific for the boustrophedon explorator
+#   [pixel^2] min area a boustrophedon cell (i.e. a boustrophedon region of the map) must have to be determined for the path generation
+# double
+min_cell_area_px: 200.0
+
+# max_deviation_from_track_px
+#   [pixel] maximal allowed shift off the ideal boustrophedon track to both sides for avoiding obstacles on track
+#   setting max_deviation_from_track=grid_spacing is usually a good choice
+#   for negative values (e.g. max_deviation_from_track: -1) max_deviation_from_track is automatically set to grid_spacing
+# int
+max_deviation_from_track_px: 0
+
 

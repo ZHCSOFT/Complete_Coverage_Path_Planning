@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(cccp_algorithm)
 
+set(CMAKE_BUILD_TYPE "Debug")
+
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system chrono thread)
@@ -34,5 +36,5 @@ target_link_libraries(${PROJECT_NAME}
     ${Boost_LIBRARIES}
 )
 
-add_subdirectory(UnitTest)
 add_subdirectory(thirdparties)
+add_subdirectory(UnitTest)
