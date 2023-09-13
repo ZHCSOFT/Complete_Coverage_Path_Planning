@@ -43,7 +43,7 @@ public:
   size_t num_bytes;
   uint8_t* message_start;
 
-  boost::shared_ptr<void const> message;
+  std::shared_ptr<void const> message;
   const std::type_info* type_info;
 
   SerializedMessage()

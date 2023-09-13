@@ -498,7 +498,7 @@ int BoustrophedonExplorer::mergeCells(cv::Mat& cell_map, cv::Mat& cell_map_label
 			if (cell_map_labels.at<int>(v, u) == BORDER_PIXEL_VALUE*256)
 				cell_map_labels.at<int>(v, u) = -1;
 	//   --> flood fill cell regions with unique id labels
-	std::map<int, boost::shared_ptr<BoustrophedonCell> > cell_index_mapping;		// maps each cell label --> to the cell object
+	std::map<int, std::shared_ptr<BoustrophedonCell> > cell_index_mapping;		// maps each cell label --> to the cell object
 	int label_index = 1;
 	for (int v=0; v<cell_map_labels.rows; ++v)
 	{
@@ -511,7 +511,7 @@ int BoustrophedonExplorer::mergeCells(cv::Mat& cell_map, cv::Mat& cell_map_label
 			// fill each cell with a unique id
 			cv::Rect bounding_box;
 			const double area = cv::floodFill(cell_map_labels, cv::Point(u, v), label_index, &bounding_box, 0, 0, 4);
-			cell_index_mapping[label_index] = boost::shared_ptr<BoustrophedonCell>(new BoustrophedonCell(label_index, area, bounding_box));
+			cell_index_mapping[label_index] = std::shared_ptr<BoustrophedonCell>(new BoustrophedonCell(label_index, area, bounding_box));
 			label_index++;
 			if (label_index == INT_MAX)
 				std::cout << "WARN: BoustrophedonExplorer::mergeCells: label_index exceeds range of int." << std::endl;
@@ -554,7 +554,7 @@ int BoustrophedonExplorer::mergeCells(cv::Mat& cell_map, cv::Mat& cell_map_label
 
 	// re-assign area labels to 1,2,3,4,...
 	int new_cell_label = 1;
-	for (std::map<int, boost::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc, ++new_cell_label)
+	for (std::map<int, std::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc, ++new_cell_label)
 		for (int v=0; v<cell_map_labels.rows; ++v)
 			for (int u=0; u<cell_map_labels.cols; ++u)
 				if (cell_map_labels.at<int>(v,u)==itc->second->label_)
@@ -564,15 +564,15 @@ int BoustrophedonExplorer::mergeCells(cv::Mat& cell_map, cv::Mat& cell_map_label
 	return cell_index_mapping.size();
 }
 
-void BoustrophedonExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell_map_labels, std::map<int, boost::shared_ptr<BoustrophedonCell> >& cell_index_mapping,
+void BoustrophedonExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell_map_labels, std::map<int, std::shared_ptr<BoustrophedonCell> >& cell_index_mapping,
 		const double min_cell_area, const int min_cell_width)
 {
 	// iteratively merge cells
 	// merge small cells below min_cell_area with their largest neighboring cell
-	std::multimap<double, boost::shared_ptr<BoustrophedonCell> > area_to_region_id_mapping;		// maps the area of each cell --> to the respective cell
-	for (std::map<int, boost::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
-		area_to_region_id_mapping.insert(std::pair<double, boost::shared_ptr<BoustrophedonCell> >(itc->second->area_, itc->second));
-	for (std::multimap<double, boost::shared_ptr<BoustrophedonCell> >::iterator it=area_to_region_id_mapping.begin(); it!=area_to_region_id_mapping.end();)
+	std::multimap<double, std::shared_ptr<BoustrophedonCell> > area_to_region_id_mapping;		// maps the area of each cell --> to the respective cell
+	for (std::map<int, std::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
+		area_to_region_id_mapping.insert(std::pair<double, std::shared_ptr<BoustrophedonCell> >(itc->second->area_, itc->second));
+	for (std::multimap<double, std::shared_ptr<BoustrophedonCell> >::iterator it=area_to_region_id_mapping.begin(); it!=area_to_region_id_mapping.end();)
 	{
 		// skip if segment is large enough (area and side length criteria)
 		if (it->first >= min_cell_area && it->second->bounding_box_.width >= min_cell_width && it->second->bounding_box_.height >= min_cell_width)
@@ -591,9 +591,9 @@ void BoustrophedonExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell
 
 		// determine the largest neighboring cell
 		const BoustrophedonCell& small_cell = *(it->second);
-		std::multimap<double, boost::shared_ptr<BoustrophedonCell>, std::greater<double> > area_sorted_neighbors;
+		std::multimap<double, std::shared_ptr<BoustrophedonCell>, std::greater<double> > area_sorted_neighbors;
 		for (BoustrophedonCell::BoustrophedonCellSetIterator itn = small_cell.neighbors_.begin(); itn != small_cell.neighbors_.end(); ++itn)
-			area_sorted_neighbors.insert(std::pair<double, boost::shared_ptr<BoustrophedonCell> >((*itn)->area_, *itn));
+			area_sorted_neighbors.insert(std::pair<double, std::shared_ptr<BoustrophedonCell> >((*itn)->area_, *itn));
 		BoustrophedonCell& large_cell = *(area_sorted_neighbors.begin()->second);
 
 		// merge the cells
@@ -601,8 +601,8 @@ void BoustrophedonExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell
 
 		// update area_to_region_id_mapping
 		area_to_region_id_mapping.clear();
-		for (std::map<int, boost::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
-			area_to_region_id_mapping.insert(std::pair<double, boost::shared_ptr<BoustrophedonCell> >(itc->second->area_, itc->second));
+		for (std::map<int, std::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
+			area_to_region_id_mapping.insert(std::pair<double, std::shared_ptr<BoustrophedonCell> >(itc->second->area_, itc->second));
 		it = area_to_region_id_mapping.begin();
 
 #ifdef DEBUG_VISUALIZATION
@@ -632,7 +632,7 @@ void BoustrophedonExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell
 				if (neighbor_labels.size() > 0)
 				{
 					int new_label = -1;
-					for (std::multimap<double, boost::shared_ptr<BoustrophedonCell> >::reverse_iterator it=area_to_region_id_mapping.rbegin(); it!=area_to_region_id_mapping.rend(); ++it)
+					for (std::multimap<double, std::shared_ptr<BoustrophedonCell> >::reverse_iterator it=area_to_region_id_mapping.rbegin(); it!=area_to_region_id_mapping.rend(); ++it)
 					{
 						if (neighbor_labels.find(it->second->label_) != neighbor_labels.end())
 						{
@@ -649,7 +649,7 @@ void BoustrophedonExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell
 }
 
 void BoustrophedonExplorer::mergeTwoCells(cv::Mat& cell_map, cv::Mat& cell_map_labels, const BoustrophedonCell& minor_cell, BoustrophedonCell& major_cell,
-		std::map<int, boost::shared_ptr<BoustrophedonCell> >& cell_index_mapping)
+		std::map<int, std::shared_ptr<BoustrophedonCell> >& cell_index_mapping)
 {
 	// execute merging the minor cell into the major cell
 	//   --> remove border from maps
@@ -684,7 +684,7 @@ void BoustrophedonExplorer::mergeTwoCells(cv::Mat& cell_map, cv::Mat& cell_map_l
 
 	// clean all references to minor_cell
 	cell_index_mapping.erase(minor_cell.label_);
-	for (std::map<int, boost::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
+	for (std::map<int, std::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
 		for (BoustrophedonCell::BoustrophedonCellSetIterator itn = itc->second->neighbors_.begin(); itn != itc->second->neighbors_.end(); ++itn)
 			if ((*itn)->label_ == minor_cell.label_)
 			{
@@ -1005,10 +1005,10 @@ void BoustrophedonExplorer::downsamplePathReverse(const std::vector<cv::Point>& 
 	}
 }
 
-void BoustrophedonExplorer::printCells(std::map<int, boost::shared_ptr<BoustrophedonCell> >& cell_index_mapping)
+void BoustrophedonExplorer::printCells(std::map<int, std::shared_ptr<BoustrophedonCell> >& cell_index_mapping)
 {
 	std::cout << "---\n";
-	for (std::map<int, boost::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
+	for (std::map<int, std::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
 	{
 		std::cout << itc->first << ": l=" << itc->second->label_ << "   a=" << itc->second->area_ << "   n=";
 		for (BoustrophedonCell::BoustrophedonCellSetIterator its=itc->second->neighbors_.begin(); its!=itc->second->neighbors_.end(); ++its)
@@ -1023,7 +1023,7 @@ void BoustrophedonExplorer::printCells(std::map<int, boost::shared_ptr<Boustroph
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void BoustrophedonVariantExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell_map_labels, std::map<int, boost::shared_ptr<BoustrophedonCell> >& cell_index_mapping,
+void BoustrophedonVariantExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell_map_labels, std::map<int, std::shared_ptr<BoustrophedonCell> >& cell_index_mapping,
 		const double min_cell_area, const int min_cell_width)
 {
 	// iteratively merge cells
@@ -1039,10 +1039,10 @@ void BoustrophedonVariantExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Ma
 	//double rotation_angle = room_rotator.computeRoomMainDirection(cell_map, map_resolution);
 
 	// merge small cells below min_cell_area with their largest neighboring cell
-	std::multimap<double, boost::shared_ptr<BoustrophedonCell> > area_to_region_id_mapping;		// maps the area of each cell --> to the respective cell
-	for (std::map<int, boost::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
-		area_to_region_id_mapping.insert(std::pair<double, boost::shared_ptr<BoustrophedonCell> >(itc->second->area_, itc->second));
-	for (std::multimap<double, boost::shared_ptr<BoustrophedonCell> >::iterator it=area_to_region_id_mapping.begin(); it!=area_to_region_id_mapping.end();)
+	std::multimap<double, std::shared_ptr<BoustrophedonCell> > area_to_region_id_mapping;		// maps the area of each cell --> to the respective cell
+	for (std::map<int, std::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
+		area_to_region_id_mapping.insert(std::pair<double, std::shared_ptr<BoustrophedonCell> >(itc->second->area_, itc->second));
+	for (std::multimap<double, std::shared_ptr<BoustrophedonCell> >::iterator it=area_to_region_id_mapping.begin(); it!=area_to_region_id_mapping.end();)
 	{
 		// abort if no cells below min_cell_area remain unmerged into bigger cells
 		if (it->first >= min_cell_area && it->second->bounding_box_.width >= min_cell_width && it->second->bounding_box_.height >= min_cell_width)
@@ -1061,9 +1061,9 @@ void BoustrophedonVariantExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Ma
 
 		// determine the largest neighboring cell
 		const BoustrophedonCell& small_cell = *(it->second);
-		std::multimap<double, boost::shared_ptr<BoustrophedonCell>, std::greater<double> > area_sorted_neighbors;
+		std::multimap<double, std::shared_ptr<BoustrophedonCell>, std::greater<double> > area_sorted_neighbors;
 		for (BoustrophedonCell::BoustrophedonCellSetIterator itn = small_cell.neighbors_.begin(); itn != small_cell.neighbors_.end(); ++itn)
-			area_sorted_neighbors.insert(std::pair<double, boost::shared_ptr<BoustrophedonCell> >((*itn)->area_, *itn));
+			area_sorted_neighbors.insert(std::pair<double, std::shared_ptr<BoustrophedonCell> >((*itn)->area_, *itn));
 		BoustrophedonCell& large_cell = *(area_sorted_neighbors.begin()->second);
 
 		// merge the cells
@@ -1071,8 +1071,8 @@ void BoustrophedonVariantExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Ma
 
 		// update area_to_region_id_mapping
 		area_to_region_id_mapping.clear();
-		for (std::map<int, boost::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
-			area_to_region_id_mapping.insert(std::pair<double, boost::shared_ptr<BoustrophedonCell> >(itc->second->area_, itc->second));
+		for (std::map<int, std::shared_ptr<BoustrophedonCell> >::iterator itc=cell_index_mapping.begin(); itc!=cell_index_mapping.end(); ++itc)
+			area_to_region_id_mapping.insert(std::pair<double, std::shared_ptr<BoustrophedonCell> >(itc->second->area_, itc->second));
 		it = area_to_region_id_mapping.begin();
 
 #ifdef DEBUG_VISUALIZATION
@@ -1102,7 +1102,7 @@ void BoustrophedonVariantExplorer::mergeCellsSelection(cv::Mat& cell_map, cv::Ma
 				if (neighbor_labels.size() > 0)
 				{
 					int new_label = -1;
-					for (std::multimap<double, boost::shared_ptr<BoustrophedonCell> >::reverse_iterator it=area_to_region_id_mapping.rbegin(); it!=area_to_region_id_mapping.rend(); ++it)
+					for (std::multimap<double, std::shared_ptr<BoustrophedonCell> >::reverse_iterator it=area_to_region_id_mapping.rbegin(); it!=area_to_region_id_mapping.rend(); ++it)
 					{
 						if (neighbor_labels.find(it->second->label_) != neighbor_labels.end())
 						{

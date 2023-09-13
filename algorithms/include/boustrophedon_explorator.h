@@ -215,8 +215,8 @@ struct BoustrophedonHorizontalLine
 // Structure for saving several properties of cells
 struct BoustrophedonCell
 {
-	typedef std::set<boost::shared_ptr<BoustrophedonCell> > BoustrophedonCellSet;
-	typedef std::set<boost::shared_ptr<BoustrophedonCell> >::iterator BoustrophedonCellSetIterator;
+	typedef std::set<std::shared_ptr<BoustrophedonCell>> BoustrophedonCellSet;
+	typedef std::set<std::shared_ptr<BoustrophedonCell>>::iterator BoustrophedonCellSetIterator;
 
 	int label_;				// label id of the cell
 	double area_;			// area of the cell, in [pixel^2]
@@ -274,12 +274,12 @@ protected:
 
 	// implements the selection criterion for cell merging, in this case: too small (area) or too thin (width or height) cells
 	// are merged with their largest neighboring cell.
-	void mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell_map_labels, std::map<int, boost::shared_ptr<BoustrophedonCell> >& cell_index_mapping,
+	void mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell_map_labels, std::map<int, std::shared_ptr<BoustrophedonCell> >& cell_index_mapping,
 			const double min_cell_area, const int min_cell_width);
 
 	// executes the merger of minor cell into major cell
 	void mergeTwoCells(cv::Mat& cell_map, cv::Mat& cell_map_labels, const BoustrophedonCell& minor_cell, BoustrophedonCell& major_cell,
-			std::map<int, boost::shared_ptr<BoustrophedonCell> >& cell_index_mapping);
+			std::map<int, std::shared_ptr<BoustrophedonCell> >& cell_index_mapping);
 
 	// this function corrects obstacles that are one pixel width at 45deg angle, i.e. a 2x2 pixel neighborhood with [0, 255, 255, 0] or [255, 0, 0, 255]
 	void correctThinWalls(cv::Mat& room_map);
@@ -298,7 +298,7 @@ protected:
 	void downsamplePathReverse(const std::vector<cv::Point>& original_path, std::vector<cv::Point>& downsampled_path,
 			cv::Point& robot_pos, const double path_eps);
 
-	void printCells(std::map<int, boost::shared_ptr<BoustrophedonCell> >& cell_index_mapping);
+	void printCells(std::map<int, std::shared_ptr<BoustrophedonCell> >& cell_index_mapping);
 
 public:
 	// constructor
@@ -321,7 +321,7 @@ class BoustrophedonVariantExplorer : public BoustrophedonExplorer
 protected:
 
 	// implements the selection criterion for cell merging, in this case: only large cells with different major axis are not merged.
-	void mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell_map_labels, std::map<int, boost::shared_ptr<BoustrophedonCell> >& cell_index_mapping,
+	void mergeCellsSelection(cv::Mat& cell_map, cv::Mat& cell_map_labels, std::map<int, std::shared_ptr<BoustrophedonCell> >& cell_index_mapping,
 			const double min_cell_area, const int min_cell_width);
 
 public:

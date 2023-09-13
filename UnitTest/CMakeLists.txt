@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(test_cccp)
 
+set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_CXX_STANDARD 11)
+
 add_executable(${PROJECT_NAME}_boustrophedon
     test_boustrophedon.cpp
 )
