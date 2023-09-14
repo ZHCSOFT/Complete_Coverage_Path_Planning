@@ -44,10 +44,11 @@ BoustrophedonExplorer::BoustrophedonExplorer()
 //		middlepoint s.t. the distance to the last robot position is minimized. If this is not wanted one has to set the
 //		corresponding Boolean to false (shows that the path planning should be done for the robot footprint).
 // room_map = expects to receive the original, not inflated room map
-void BoustrophedonExplorer::getExplorationPath(const cv::Mat& room_map, std::vector<geometry_msgs::Pose2D>& path,
-		const float map_resolution, const cv::Point starting_position, const cv::Point2d map_origin,
-		const double grid_spacing_in_pixel, const double grid_obstacle_offset, const double path_eps, const int cell_visiting_order,
-		const bool plan_for_footprint, const Eigen::Matrix<float, 2, 1> robot_to_fov_vector, const double min_cell_area, const int max_deviation_from_track)
+void BoustrophedonExplorer::getExplorationPath(std::vector<geometry_msgs::Pose2D>& path,
+											   const cv::Mat& room_map,
+											   const float map_resolution, const cv::Point starting_position, const cv::Point2d map_origin,
+											   const double grid_spacing_in_pixel, const double grid_obstacle_offset, const double path_eps, const int cell_visiting_order,
+											   const bool plan_for_footprint, const Eigen::Matrix<float, 2, 1> robot_to_fov_vector, const double min_cell_area, const int max_deviation_from_track)
 {
 	std::cout << "Planning the boustrophedon path trough the room." << std::endl;
 	const int grid_spacing_as_int = (int)std::floor(grid_spacing_in_pixel); // convert fov-radius to int
