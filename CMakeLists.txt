@@ -23,6 +23,8 @@ add_library(${PROJECT_NAME} SHARED
     utils/src/ipa_building_navigation/nearest_neighbor_TSP.cpp
 
     utils/src/ros/map_accessibility_analysis.cpp
+
+    utils/src/dataloader.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

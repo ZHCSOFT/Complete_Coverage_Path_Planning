@@ -530,6 +530,8 @@ int BoustrophedonExplorer::mergeCells(cv::Mat& cell_map, cv::Mat& cell_map_label
 				const int label_right = cell_map_labels.at<int>(v, u+1);
 				if (label_left > 0 && label_right > 0)
 				{
+					std::cout << "[ DEBUG ] Test cell_index_mapping[label_left]: " << cell_index_mapping[label_left] << std::endl;
+					std::cout << "[ DEBUG ] Test cell_index_mapping[label_right]: " << cell_index_mapping[label_right] << std::endl;
 					cell_index_mapping[label_left]->neighbors_.insert(cell_index_mapping[label_right]);
 					cell_index_mapping[label_right]->neighbors_.insert(cell_index_mapping[label_left]);
 				}
@@ -537,6 +539,8 @@ int BoustrophedonExplorer::mergeCells(cv::Mat& cell_map, cv::Mat& cell_map_label
 				const int label_down = cell_map_labels.at<int>(v+1, u);
 				if (label_up > 0 && label_down > 0)
 				{
+					std::cout << "[ DEBUG ] Test cell_index_mapping[label_up]: " << cell_index_mapping[label_up] << std::endl;
+					std::cout << "[ DEBUG ] Test cell_index_mapping[label_down]: " << cell_index_mapping[label_down] << std::endl;
 					cell_index_mapping[label_up]->neighbors_.insert(cell_index_mapping[label_down]);
 					cell_index_mapping[label_down]->neighbors_.insert(cell_index_mapping[label_up]);
 				}

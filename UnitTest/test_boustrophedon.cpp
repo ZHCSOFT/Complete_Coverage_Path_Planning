@@ -1,6 +1,7 @@
 #include <iostream>
 #include "boustrophedon_explorator.h"
 #include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include "yaml-cpp/yaml.h"
 
 
