@@ -10,7 +10,6 @@ add_executable(${PROJECT_NAME}_boustrophedon
 
 target_link_libraries(${PROJECT_NAME}_boustrophedon
     cccp_algorithm
-    yaml-cpp
 )
 
 target_include_directories(${PROJECT_NAME}_boustrophedon PRIVATE
